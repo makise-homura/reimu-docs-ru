@@ -1,0 +1,38 @@
+#!/bin/bash
+
+comment="<!---\n\
+****************************************************************************\n\
+*                                                                          *\n\
+*  Automatically generated file. Do not edit. Edit template file instead.  *\n\
+*                                                                          *\n\
+****************************************************************************\n\
+--->"
+
+echo Creating Git Markdown manual...
+. git.conf
+echo -e "$comment" > reimu.md
+INTRO="$NAME1 $NAME2 $DESIGNEDTO"
+sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.md
+
+echo Creating ESPD Markdown intermediate...
+. espd.conf
+echo -e "$comment" > reimu.espd.md
+INTRO="$NAME1 $NAME2 $DESIGNEDTO"
+sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.espd.md
+
+echo Creating ESPD slave document...
+pandoc -s reimu.espd.md -t odt -o reimu.espd.odt
+
+echo Setting variables for ESPD master OpenDocument...
+rm -rf root.template.data
+unzip -q root.template.odm -d root.template.data
+cd root.template.data
+xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
+xmlstarlet edit -L -u './/*/text:variable-get[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
+xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя1"]' -v "${NAME1^^}" content.xml
+xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя2"]' -v "${NAME2^^}" content.xml
+zip -q -r ../root.odm .
+cd ..
+
+echo "Master and slave documents are ready. Now you could export .odm to final .odt."
+echo "More info of how to do this: https://wiki.openoffice.org/wiki/Documentation/OOo3_User_Guides/Writer_Guide/Creating_one_file_from_a_master_document"
