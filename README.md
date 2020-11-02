@@ -4,6 +4,36 @@ The actual documentation is [here](reimu.md)
 
 # How to build documentation
 
+## Overview of building scheme
+
+```
+git.conf ─────────────────┐
+                          ├──────────────────────────────► reimu.md
+                     ┌────┘
+reimu.template.md ───┤
+                     └────┐
+                          ├────► reimu.espd.md ────► reimu.espd.odt
+                     ┌────┘
+espd.conf ───────────┤
+                     └────┐
+                          ├────► root.template.data ─────► root.odm
+root.template.odm ────────┘
+
+```
+
+Source files:
+* `reimu.template.md`: The source of documentation in Markdown format, including places for variable substitution
+* `root.template.odm`: Template of master ODF document, including title, ToC, and changelog pages
+* `git.conf`: Variables for Markdown documentation
+* `espd.conf`: Variables for ESPD ODF documentation
+
+Created files:
+* `reimu.md`: Markdown documentation
+* `root.odm`: Master document of ESPD ODF documentation
+* `reimu.espd.odt`: Slave document of ESPD ODF documentation
+
+## Building
+
 Just run `./build`.
 
 Prerequisites:
@@ -11,11 +41,6 @@ Prerequisites:
 * pandoc
 * zip, unzip
 * xmlstarlet
-
-Created files:
-* `reimu.md`: Markdown documentation
-* `root.odm`: Master document of ESPD ODF docmentation
-* `reimu.espd.odt`: Slave document of ESPD ODF docmentation
 
 After you created the ODF documentation, you should do the following:
 * Open the master document
