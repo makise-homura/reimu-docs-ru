@@ -25,7 +25,8 @@ After you created the ODF documentation, you should do the following:
 * Break links as specified [here](https://wiki.openoffice.org/wiki/Documentation/OOo3_User_Guides/Writer_Guide/Creating_one_file_from_a_master_document)
 * Save resulting ODF
 
-Configuration files
+## Configuration files
+
 You may edit `git.conf` and `espd.conf` to specify some significant variables:
 * `DN`: ESPD decimal number of product (has sense for `espd.conf` only)
 * `NAME1`: First line of full product name
