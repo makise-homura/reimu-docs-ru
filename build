@@ -20,8 +20,21 @@ echo -e "$comment" > reimu.espd.md
 INTRO="$NAME1 $NAME2 $DESIGNEDTO"
 sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.espd.md
 
+echo Removing links from Markdown intermediate...
+sed -i "s/\[\([^]]*\)\]([^)]*)/\1/g" reimu.espd.md
+
 echo Creating ESPD slave document...
-pandoc -s reimu.espd.md -t odt -o reimu.espd.odt
+pandoc -s reimu.espd.md -t odt -o reimu.espd.intermediate.odt
+
+echo Altering styles for ESPD slave OpenDocument...
+rm -rf reimu.espd.data
+unzip -q reimu.espd.intermediate.odt -d reimu.espd.data
+cd reimu.espd.data
+xmlstarlet edit -L -d './/*/text:list-level-style-bullet' content.xml
+xmlstarlet edit -L -s './/*/text:list-style' -t elem -n 'text:list-level-style-bullet text:level="1" text:style-name="Text_20_body" style:num-suffix="." text:bullet-char="-"' content.xml
+xmlstarlet edit -L -s './/*/text:list-level-style-bullet' -t elem -n 'style:list-level-properties text:space-before="0.25in" text:min-label-width="0.25in"' content.xml
+zip -q -r ../reimu.espd.odt .
+cd ..
 
 echo Setting variables for ESPD master OpenDocument...
 rm -rf root.template.data
