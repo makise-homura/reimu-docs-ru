@@ -7,19 +7,27 @@ The actual documentation is [here](reimu.md)
 ## Overview of building scheme
 
 ```
-git.conf ─────────────────┐
-                          ├──────────────────────────────► reimu.md
+git.conf ─────────────────┐ vars
+                          ├──────► reimu.md
                      ┌────┘
 reimu.template.md ───┤
-                     └────┐
-                          ├────► reimu.espd.md ────► reimu.espd.odt
+                     └────┐ vars, links                  pandoc                                unzip, styles                                 zip
+                          ├─────────────► reimu.espd.md ────────► reimu.espd.intermediate.odt ───────────────► reimu.espd.intermediate.data ─────► reimu.espd.odt
                      ┌────┘
 espd.conf ───────────┤
-                     └────┐
-                          ├────► root.template.data ─────► root.odm
+                     └────┐ vars                       zip
+                    unzip ├──────► root.template.data ─────► root.odm
 root.template.odm ────────┘
 
 ```
+
+Build stages:
+* `vars`: substitute variables defined in `.conf` files
+* `links`: remove links
+* `pandoc`: convert `.md` to `.odt`
+* `unzip`: unzip `.odt` to directory containing `.xml` files
+* `styles`: alter list styles
+* `zip`: zip directory containing `.xml` files back to `.odt`
 
 Source files:
 * `reimu.template.md`: The source of documentation in Markdown format, including places for variable substitution
