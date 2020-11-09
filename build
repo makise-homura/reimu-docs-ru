@@ -30,9 +30,14 @@ echo Altering styles for ESPD slave OpenDocument...
 rm -rf reimu.espd.data
 unzip -q reimu.espd.intermediate.odt -d reimu.espd.data
 cd reimu.espd.data
+# Remove bullets
 xmlstarlet edit -L -d './/*/text:list-level-style-bullet' content.xml
 xmlstarlet edit -L -s './/*/text:list-style' -t elem -n 'text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" style:num-suffix="." text:bullet-char="-"' content.xml
 xmlstarlet edit -L -s './/*/text:list-level-style-bullet' -t elem -n 'style:list-level-properties text:space-before="0in" text:min-label-width="0.25in"' content.xml
+# Remove number of abbreviation list
+xmlstarlet edit -L -s './/*/office:automatic-styles' -t elem -n 'style:style style:name="Heading_No_Numbers" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name=""' content.xml
+xmlstarlet edit -L -s './/*/style:style[@style:name="Heading_No_Numbers"]' -t elem -n 'style:paragraph-properties style:writing-mode="page"' content.xml
+xmlstarlet edit -L -u './/*/text:h[text() = "Перечень сокращений"]/@text:style-name' -v 'Heading_No_Numbers' content.xml
 rm ../reimu.espd.odt
 zip -q -r ../reimu.espd.odt .
 cd ..
