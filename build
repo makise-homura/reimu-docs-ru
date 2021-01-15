@@ -38,7 +38,7 @@ xmlstarlet edit -L -s './/*/text:list-level-style-bullet' -t elem -n 'style:list
 xmlstarlet edit -L -s './/*/office:automatic-styles' -t elem -n 'style:style style:name="Heading_No_Numbers" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name=""' content.xml
 xmlstarlet edit -L -s './/*/style:style[@style:name="Heading_No_Numbers"]' -t elem -n 'style:paragraph-properties style:writing-mode="page"' content.xml
 xmlstarlet edit -L -u './/*/text:h[text() = "Перечень сокращений"]/@text:style-name' -v 'Heading_No_Numbers' content.xml
-rm ../reimu.espd.odt
+rm -f ../reimu.espd.odt
 zip -q -r ../reimu.espd.odt .
 cd ..
 
@@ -50,7 +50,7 @@ xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Децимальный
 xmlstarlet edit -L -u './/*/text:variable-get[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
 xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя1"]' -v "${NAME1^^}" content.xml
 xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя2"]' -v "${NAME2^^}" content.xml
-rm ../root.odm
+rm -f ../root.odm
 zip -q -r ../root.odm .
 cd ..
 
