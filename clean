@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -rf root.template.data
+rm -rf reimu.espd.data
+rm -f reimu.espd.md
+rm -f reimu.espd.intermediate.odt
+rm -f reimu.espd.odt
+rm -f root.odm

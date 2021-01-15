@@ -44,6 +44,8 @@ Created files:
 
 Just run `./build`.
 
+You may run `./clean` to get rid of everything created during build.
+
 Prerequisites:
 * sed
 * pandoc
