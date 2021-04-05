@@ -218,6 +218,71 @@ Web-интерфейс менеджера присутствует только 
 
 Команды `query` и `show` возвращают 0 в случае, если UID выключен, и 1 – если включён. Это полезно для использования в пользовательских скриптах.
 
+## DBus
+
+На 64-мегабайтных флаворах доступно выполнение команд управления платформой с помощью посылки сообщений DBus, например, командой `busctl`.
+
+Например:
+
+* `busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState` – показать текущий статус питания платформы;
+* `busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Host.Transition.On` – включить платформу;
+* `busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Host.Transition.HardOff` – жёстко выключить платформу;
+* `busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Host.Transition.Off` – мягко выключить платформу;
+* `busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Host.Transition.Reboot` – перезагрузить платформу;
+* `busctl set-property xyz.openbmc_project.LED.GroupManager /xyz/openbmc_project/led/groups/enclosure_identify xyz.openbmc_project.Led.Group Asserted b true` – включить светодиод UID;
+* `busctl set-property xyz.openbmc_project.LED.GroupManager /xyz/openbmc_project/led/groups/enclosure_identify xyz.openbmc_project.Led.Group Asserted b false` – выключить светодиод UID;
+* `busctl get-property xyz.openbmc_project.LED.GroupManager /xyz/openbmc_project/led/groups/enclosure_identify xyz.openbmc_project.Led.Group Asserted` – показать статус светодиода UID.
+
+## IPMI
+
+На 64-мегабайтных флаворах доступно выполнение команд управления платформой с помощью протокола IPMI, например, командой `ipmitool`.
+
+Например, возможны следующие команды:
+
+* `chassis power status` – показать текущий статус питания платформы;
+* `chassis power on` – включить платформу;
+* `chassis power off` – жёстко выключить платформу;
+* `chassis power soft` – мягко выключить платформу;
+* `chassis power reset` – перезагрузить платформу;
+* `chassis identify force` – включить светодиод UID;
+* `chassis identify 0` – выключить светодиод UID;
+* `chassis identify N` – включить светодиод UID на N секунд, затем выключить.
+
+Локально (в SSH-сессии BMC) эти команды просто передаются как аргументы команды `ipmitool`.
+
+Удалённо можно выполнять эти команды с использованием протокола `lanplus`:
+
+```
+ipmitool -I lanplus -C 17 -H <хост> -U <логин> -P <пароль> <команда и параметры>.
+```
+
+Здесь слова `<хост>`, `<логин>` и `<пароль>` нужно заменить на те, на которые настроен BMC.
+
+## Redfish
+
+На 64-мегабайтных флаворах доступно выполнение команд управления платформой с помощью протокола Redfish, например, отправляя запросы с помощью `curl`.
+
+Сначала нужно аутентифицироваться и получить токен:
+
+```
+curl -s --insecure -X POST https://<хост>/redfish/v1/SessionService/Sessions -d '{"UserName":"<логин>", "Password":"<пароль>"}' -D - | grep 'X-Auth-Token' | sed 's/X-Auth-Token: //'
+```
+
+Здесь и далее слова `<хост>`, `<логин>` и `<пароль>` нужно заменить на те, на которые настроен BMC.
+
+Вывод вышеприведённой команды далее будет использоваться во всех обращениях в месте, где написано `<токен>`.
+
+Примеры запросов по протоколу Redfish:
+
+* `curl -s -k -H "X-Auth-Token: <токен>" -X GET   https://<хост>/redfish/v1/Systems/system/ | grep PowerState` – показать текущий статус питания платформы;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X POST  https://<хост>/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{"ResetType": "On"}'` – включить платформу;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X POST  https://<хост>/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{"ResetType": "ForceOff"}'` – жёстко выключить платформу;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X POST  https://<хост>/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{"ResetType": "GracefulShutdown"}'` – мягко выключить платформу;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X POST  https://<хост>/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{"ResetType": "ForceRestart"}'` – перезагрузить платформу;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X PATCH https://<хост>/redfish/v1/Systems/system/ -d '{"IndicatorLED": "Lit"}'` – включить светодиод UID;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X PATCH https://<хост>/redfish/v1/Systems/system/ -d '{"IndicatorLED": "Off"}'` – выключить светодиод UID;
+* `curl -s -k -H "X-Auth-Token: <токен>" -X GET   https://<хост>/redfish/v1/Systems/system/ | grep IndicatorLED` – показать статус светодиода UID.
+
 ## Определение перегрева процессоров
 
 По умолчанию в ПО REIMU включен демон `overheatd`, который использует протоколы GPIO, TinySPI (при наличии ПЛИС, реализующей этот протокол, на платформе; описание данного протокола приведено в документации на прошивку ПЛИС: [http://git.lab.sun.mcst.ru/molchan_i/e8c_cpld_firmware/blob/master/docs/TinySPI_description.doc](http://git.lab.sun.mcst.ru/molchan_i/e8c_cpld_firmware/blob/master/docs/TinySPI_description.doc)) и I²C для определения событий перегрева процессоров. В случае допустимого перегрева процессоров (температура как минимум одного ядра присутствующего в платформе процессора выше установленного лимита, по умолчанию +85 ºC) начинает мигать светодиод перегрева на передней панели сервера (подключенный к разъёму «Overheat/Fan Fail» панелей фирмы Supermicro или к разъёму «Overheat» панелей фирмы «Депо»). В случае критического перегрева (выдачи процессором сигнала `TTRIP`, включая ситуацию, когда материнская плата экстренно выключила питание процессоров) данный светодиод светится постоянно.
