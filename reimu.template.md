@@ -200,6 +200,13 @@ Web-интерфейс менеджера присутствует только 
 
 Команды `server_pwr_*` не производят никаких действий, если платформа уже находится в нужном состоянии.
 
+Вместо запуска некоторых из этих команд можно запустить следующие сервисы systemd (например, с помощью команды `systemctl start`):
+
+* `server_pwr_on` – сервис `host-poweron.service`;
+* `server_pwr_off` – сервис `host-poweroff.service`;
+* `server_pwr_off_hard` – сервис `host-poweroff-hard.service`;
+* `server_reset` – сервис `host-reset.service`.
+
 Возможно автоматическое включение питания платформы при подключении к ней STANDBY-питания. Для этого в файле `/etc/auto_power_on` нужно заменить строчку «`AUTO_POWER_ON=off`» на «`AUTO_POWER_ON=on`».
 
 Работа с UID осуществляется, помимо кнопки UID, командой `server_uid`:
