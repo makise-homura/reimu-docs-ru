@@ -50,6 +50,7 @@ xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Децимальный
 xmlstarlet edit -L -u './/*/text:variable-get[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
 xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя1"]' -v "${NAME1^^}" content.xml
 xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя2"]' -v "${NAME2^^}" content.xml
+xmlstarlet edit -L -u './/*/text:variable-set[@text:name="ИмяВГенитиве"]' -v "${NAMEOF^^}" content.xml
 rm -f ../root.odm
 zip -q -r ../root.odm .
 cd ..
