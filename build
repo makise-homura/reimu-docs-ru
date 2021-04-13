@@ -14,46 +14,56 @@ echo -e "$comment" > reimu.md
 INTRO="$NAME1 $NAME2 $DESIGNEDTO"
 sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.md
 
-echo Creating ESPD Markdown intermediate...
-. espd.conf
-echo -e "$comment" > reimu.espd.md
-INTRO="$NAME1 $NAME2 $DESIGNEDTO"
-sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.espd.md
+for i in 306 308 dacn
+do
 
-echo Removing links from Markdown intermediate...
-sed -i "s/\[\([^]]*\)\]([^)]*)/\1/g" reimu.espd.md
+    echo Creating $i ESPD Markdown intermediate...
+    . espd.conf.$i
+    echo -e "$comment" > reimu.espd.md
+    INTRO="$NAME1 $NAME2 $DESIGNEDTO"
+    sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.espd.md
 
-echo Creating ESPD slave document...
-pandoc -s reimu.espd.md -t odt -o reimu.espd.intermediate.odt
+    echo "Removing links from Markdown intermediate..."
+    sed -i "s/\[\([^]]*\)\]([^)]*)/\1/g" reimu.espd.md
 
-echo Altering styles for ESPD slave OpenDocument...
-rm -rf reimu.espd.data
-unzip -q reimu.espd.intermediate.odt -d reimu.espd.data
-cd reimu.espd.data
-# Remove bullets
-xmlstarlet edit -L -d './/*/text:list-level-style-bullet' content.xml
-xmlstarlet edit -L -s './/*/text:list-style' -t elem -n 'text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" style:num-suffix="." text:bullet-char="-"' content.xml
-xmlstarlet edit -L -s './/*/text:list-level-style-bullet' -t elem -n 'style:list-level-properties text:space-before="0in" text:min-label-width="0.25in"' content.xml
-# Remove number of abbreviation list
-xmlstarlet edit -L -s './/*/office:automatic-styles' -t elem -n 'style:style style:name="Heading_No_Numbers" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name=""' content.xml
-xmlstarlet edit -L -s './/*/style:style[@style:name="Heading_No_Numbers"]' -t elem -n 'style:paragraph-properties style:writing-mode="page"' content.xml
-xmlstarlet edit -L -u './/*/text:h[text() = "Перечень сокращений"]/@text:style-name' -v 'Heading_No_Numbers' content.xml
-rm -f ../reimu.espd.odt
-zip -q -r ../reimu.espd.odt .
-cd ..
+    echo "Creating $i ESPD slave document..."
+    pandoc -s reimu.espd.md -t odt -o reimu.espd.intermediate.odt
 
-echo Setting variables for ESPD master OpenDocument...
-rm -rf root.template.data
-unzip -q root.template.odm -d root.template.data
-cd root.template.data
-xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
-xmlstarlet edit -L -u './/*/text:variable-get[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
-xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя1"]' -v "${NAME1^^}" content.xml
-xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя2"]' -v "${NAME2^^}" content.xml
-xmlstarlet edit -L -u './/*/text:variable-set[@text:name="ИмяВГенитиве"]' -v "${NAMEOF^^}" content.xml
-rm -f ../root.odm
-zip -q -r ../root.odm .
-cd ..
+    echo "Altering styles for $i ESPD slave OpenDocument..."
+    rm -rf reimu.espd.data
+    unzip -q reimu.espd.intermediate.odt -d reimu.espd.data
+    cd reimu.espd.data
+    # Remove bullets
+    xmlstarlet edit -L -d './/*/text:list-level-style-bullet' content.xml
+    xmlstarlet edit -L -s './/*/text:list-style' -t elem -n 'text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" style:num-suffix="." text:bullet-char="-"' content.xml
+    xmlstarlet edit -L -s './/*/text:list-level-style-bullet' -t elem -n 'style:list-level-properties text:space-before="0in" text:min-label-width="0.25in"' content.xml
+    # Remove number of abbreviation list
+    xmlstarlet edit -L -s './/*/office:automatic-styles' -t elem -n 'style:style style:name="Heading_No_Numbers" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name=""' content.xml
+    xmlstarlet edit -L -s './/*/style:style[@style:name="Heading_No_Numbers"]' -t elem -n 'style:paragraph-properties style:writing-mode="page"' content.xml
+    xmlstarlet edit -L -u './/*/text:h[text() = "Перечень сокращений"]/@text:style-name' -v 'Heading_No_Numbers' content.xml
+    rm -f ../reimu.espd.odt
+    zip -q -r ../reimu.espd.odt .
+    cd ..
 
-echo "Master and slave documents are ready. Now you could export .odm to final .odt."
+    echo "Setting variables for $i ESPD master OpenDocument..."
+    rm -rf root.template.data
+    unzip -q root.template.odm -d root.template.data
+    cd root.template.data
+    xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
+    xmlstarlet edit -L -u './/*/text:variable-get[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
+    xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя1"]' -v "${NAME1^^}" content.xml
+    xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя2"]' -v "${NAME2^^}" content.xml
+    xmlstarlet edit -L -u './/*/text:variable-set[@text:name="ИмяВГенитиве"]' -v "${NAMEOF^^}" content.xml
+    rm -f ../root.odm
+    zip -q -r ../root.odm .
+    cd ..
+
+    echo "Moving master and slave documents to output directory ./result.$i"
+    mkdir -p result.$i
+    mv root.odm result.$i/
+    mv reimu.espd.odt result.$i/
+done
+
+echo
+echo "Markdown, and master and slave documents are ready. Now you could export .odm to final .odt."
 echo "More info of how to do this: https://wiki.openoffice.org/wiki/Documentation/OOo3_User_Guides/Writer_Guide/Creating_one_file_from_a_master_document"

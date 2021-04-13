@@ -11,12 +11,12 @@ git.conf ─────────────────┐ vars
                           ├──────► reimu.md
                      ┌────┘
 reimu.template.md ───┤
-                     └────┐ vars, links                  pandoc                                unzip, styles                                 zip
-                          ├─────────────► reimu.espd.md ────────► reimu.espd.intermediate.odt ───────────────► reimu.espd.intermediate.data ─────► reimu.espd.odt
+                     └────┐ vars, links                  pandoc                                unzip, styles                                 zip                   mv
+                          ├─────────────► reimu.espd.md ────────► reimu.espd.intermediate.odt ───────────────► reimu.espd.intermediate.data ─────► reimu.espd.odt ────► result.*/
                      ┌────┘
-espd.conf ───────────┤
-                     └────┐ vars                       zip
-                    unzip ├──────► root.template.data ─────► root.odm
+espd.conf.* ─────────┤
+                     └────┐ vars                       zip             mv
+                    unzip ├──────► root.template.data ─────► root.odm ────► result.*/
 root.template.odm ────────┘
 
 ```
@@ -28,17 +28,18 @@ Build stages:
 * `unzip`: unzip `.odt` to directory containing `.xml` files
 * `styles`: alter list styles
 * `zip`: zip directory containing `.xml` files back to `.odt`
+* `mv`: move resulting `.odt` and `.odm` files to output directory
 
 Source files:
 * `reimu.template.md`: The source of documentation in Markdown format, including places for variable substitution
 * `root.template.odm`: Template of master ODF document, including title, ToC, and changelog pages
 * `git.conf`: Variables for Markdown documentation
-* `espd.conf`: Variables for ESPD ODF documentation
+* `espd.conf.*`: Variables for ESPD ODF documentation (`*` is `306`, `308`, and `dacn` for several output configurations)
 
 Created files:
 * `reimu.md`: Markdown documentation
-* `root.odm`: Master document of ESPD ODF documentation
-* `reimu.espd.odt`: Slave document of ESPD ODF documentation
+* `result.*/root.odm`: Master document of ESPD ODF documentation (`*` is `306`, `308`, and `dacn`)
+* `result.*/reimu.espd.odt`: Slave document of ESPD ODF documentation (`*` is `306`, `308`, and `dacn`)
 
 ## Building
 
@@ -62,8 +63,9 @@ After you created the ODF documentation, you should do the following:
 
 ## Configuration files
 
-You may edit `git.conf` and `espd.conf` to specify some significant variables:
-* `DN`: ESPD decimal number of product (has sense for `espd.conf` only)
+You may edit `git.conf` and `espd.conf.*` to specify some significant variables:
+* `DN`: ESPD decimal number of product (has sense for `espd.conf.*` only)
 * `NAME1`: First line of full product name
 * `NAME2`: Second line of full product name
+* `NAMEOF`: Full product name in genitive case (has sense for `espd.conf.*` only)
 * `DESIGNEDTO`: a literal spelling of word "designed to"
