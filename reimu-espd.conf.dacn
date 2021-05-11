@@ -1,0 +1,13 @@
+INPUTFILE=reimu.template.md
+MARKDOWNFILE=reimu.espd.md
+INTERMEDIATE=reimu.espd.intermediate.odt
+ROOTTEMPLATE=reimu-root.template.odm
+OUTPUTDATAFILE=reimu.espd.odt
+OUTPUTROOTFILE=root.odm
+OUTPUTDIR=result-manual.dacn
+
+DN="643.ДАЦН.20001-01"
+NAME1="Программное обеспечение"
+NAME2="контроллера удалённого управления (BMC)"
+NAMEOF="программного обеспечения контроллера удалённого управления (BMC)"
+DESIGNEDTO="(далее ПО REIMU) предназначено"

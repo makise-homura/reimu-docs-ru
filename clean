@@ -1,7 +1,10 @@
 #!/bin/bash
 
-rm -rf root.template.data
-rm -rf reimu.espd.data
-rm -rf result.{306,308,dacn}
+rm -rf workdir
+rm -rf result-manual.{306,308,dacn}
+rm -rf result-build.{306,308,dacn}
+
 rm -f reimu.espd.md
 rm -f reimu.espd.intermediate.odt
+rm -f build.espd.md
+rm -f build.espd.intermediate.odt

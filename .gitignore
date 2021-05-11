@@ -1,7 +1,11 @@
-root.template.data/*
-reimu.espd.data/*
 reimu.espd.md
 reimu.espd.intermediate.odt
-result.306/*
-result.308/*
-result.dacn/*
+build.espd.md
+build.espd.intermediate.odt
+result-manual.306/*
+result-manual.308/*
+result-manual.dacn/*
+result-build.306/*
+result-build.308/*
+result-build.dacn/*
+workdir/*

@@ -1,4 +1,12 @@
-DN="ТВГИ.00308-01"
+INPUTFILE=reimu.template.md
+MARKDOWNFILE=reimu.espd.md
+INTERMEDIATE=reimu.espd.intermediate.odt
+ROOTTEMPLATE=reimu-root.template.odm
+OUTPUTDATAFILE=reimu.espd.odt
+OUTPUTROOTFILE=root.odm
+OUTPUTDIR=result-manual.306
+
+DN="ТВГИ.00306-01"
 NAME1="Встроенное программное"
 NAME2="обеспечение менеджера"
 NAMEOF="встроенного программного обеспечения менеджера"

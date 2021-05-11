@@ -1,3 +1,11 @@
+INPUTFILE=build.template.md
+MARKDOWNFILE=build.espd.md
+INTERMEDIATE=build.espd.intermediate.odt
+ROOTTEMPLATE=build-root.template.odm
+OUTPUTDATAFILE=build.espd.odt
+OUTPUTROOTFILE=root.odm
+OUTPUTDIR=result-build.dacn
+
 DN="643.ДАЦН.20001-01"
 NAME1="Программное обеспечение"
 NAME2="контроллера удалённого управления (BMC)"

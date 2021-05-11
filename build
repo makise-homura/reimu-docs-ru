@@ -1,38 +1,61 @@
 #!/bin/bash
 
-comment="<!---\n\
-****************************************************************************\n\
-*                                                                          *\n\
-*  Automatically generated file. Do not edit. Edit template file instead.  *\n\
-*                                                                          *\n\
-****************************************************************************\n\
---->"
+substitute_intro()
+{
+    sed "s/@TEMPLATE=INTRO@/$3/g" $1 >> $2
+}
 
-echo Creating Git Markdown manual...
-. git.conf
-echo -e "$comment" > reimu.md
-INTRO="$NAME1 $NAME2 $DESIGNEDTO"
-sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.md
+copy_contents()
+{
+    cat $1 >> $2
+}
 
-for i in 306 308 dacn
-do
+add_comment()
+{
+    comment="    <!---\n\
+    ****************************************************************************\n\
+    *                                                                          *\n\
+    *  Automatically generated file. Do not edit. Edit template file instead.  *\n\
+    *                                                                          *\n\
+    ****************************************************************************\n\
+    --->"
+    echo -e "$comment" > $1
+}
 
-    echo Creating $i ESPD Markdown intermediate...
-    . espd.conf.$i
-    echo -e "$comment" > reimu.espd.md
-    INTRO="$NAME1 $NAME2 $DESIGNEDTO"
-    sed "s/@TEMPLATE=INTRO@/$INTRO/g" reimu.template.md >> reimu.espd.md
+remove_links()
+{
+    sed -i "s/\[\([^]]*\)\]([^)]*)/\1/g" $1
+}
 
-    echo "Removing links from Markdown intermediate..."
-    sed -i "s/\[\([^]]*\)\]([^)]*)/\1/g" reimu.espd.md
+md_to_odt()
+{
+    pandoc -s $1 -t odt -o $2
+}
 
-    echo "Creating $i ESPD slave document..."
-    pandoc -s reimu.espd.md -t odt -o reimu.espd.intermediate.odt
+zip_to_dir()
+{
+    rm -rf workdir
+    unzip -q $1 -d workdir
+    cd workdir
+}
 
-    echo "Altering styles for $i ESPD slave OpenDocument..."
-    rm -rf reimu.espd.data
-    unzip -q reimu.espd.intermediate.odt -d reimu.espd.data
-    cd reimu.espd.data
+dir_to_zip()
+{
+    rm -f ../$1
+    zip -q -r ../$1 .
+    cd ..
+    rm -rf workdir
+}
+
+move_result()
+{
+    mkdir -p $1
+    mv $2 $1/
+    mv $3 $1/
+}
+
+modify_slave_content()
+{
     # Remove bullets
     xmlstarlet edit -L -d './/*/text:list-level-style-bullet' content.xml
     xmlstarlet edit -L -s './/*/text:list-style' -t elem -n 'text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" style:num-suffix="." text:bullet-char="-"' content.xml
@@ -41,29 +64,57 @@ do
     xmlstarlet edit -L -s './/*/office:automatic-styles' -t elem -n 'style:style style:name="Heading_No_Numbers" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name=""' content.xml
     xmlstarlet edit -L -s './/*/style:style[@style:name="Heading_No_Numbers"]' -t elem -n 'style:paragraph-properties style:writing-mode="page"' content.xml
     xmlstarlet edit -L -u './/*/text:h[text() = "Перечень сокращений"]/@text:style-name' -v 'Heading_No_Numbers' content.xml
-    rm -f ../reimu.espd.odt
-    zip -q -r ../reimu.espd.odt .
-    cd ..
+}
 
-    echo "Setting variables for $i ESPD master OpenDocument..."
-    rm -rf root.template.data
-    unzip -q root.template.odm -d root.template.data
-    cd root.template.data
+modify_master_content()
+{
     xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
     xmlstarlet edit -L -u './/*/text:variable-get[@text:name="Децимальныйномер"]' -v "${DN}" content.xml
     xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя1"]' -v "${NAME1^^}" content.xml
     xmlstarlet edit -L -u './/*/text:variable-set[@text:name="Имя2"]' -v "${NAME2^^}" content.xml
     xmlstarlet edit -L -u './/*/text:variable-set[@text:name="ИмяВГенитиве"]' -v "${NAMEOF}" content.xml
-    rm -f ../root.odm
-    zip -q -r ../root.odm .
-    cd ..
+}
 
-    echo "Moving master and slave documents to output directory ./result.$i"
-    mkdir -p result.$i
-    mv root.odm result.$i/
-    mv reimu.espd.odt result.$i/
+echo "Creating Git Markdown manual..."
+. reimu-git.conf
+add_comment $OUTPUTFILE
+substitute_intro $INPUTFILE $OUTPUTFILE "$NAME1 $NAME2 $DESIGNEDTO"
+
+echo "Creating Git Markdown build manual..."
+. build-git.conf
+add_comment $OUTPUTFILE
+copy_contents $INPUTFILE $OUTPUTFILE
+
+for product in 306 308 dacn
+do
+    for document in reimu build
+    do
+        echo "Creating $document-$product ESPD Markdown intermediate..."
+        . $document-espd.conf.$product
+        add_comment $MARKDOWNFILE
+        substitute_intro $INPUTFILE $MARKDOWNFILE "$NAME1 $NAME2 $DESIGNEDTO"
+
+        echo "Removing links from Markdown intermediate..."
+        remove_links $MARKDOWNFILE
+
+        echo "Creating $document-$product ESPD slave document..."
+        md_to_odt $MARKDOWNFILE $INTERMEDIATE
+
+        echo "Altering styles for $document-$product ESPD slave OpenDocument..."
+        zip_to_dir $INTERMEDIATE
+        modify_slave_content
+        dir_to_zip $OUTPUTDATAFILE
+
+        echo "Setting variables for $document-$product ESPD master OpenDocument..."
+        zip_to_dir $ROOTTEMPLATE
+        modify_master_content
+        dir_to_zip $OUTPUTROOTFILE
+
+        echo "Moving master and slave documents to output directory $OUTPUTDIR"
+        move_result $OUTPUTDIR $OUTPUTROOTFILE $OUTPUTDATAFILE
+    done
 done
 
 echo
-echo "Markdown, and master and slave documents are ready. Now you could export .odm to final .odt."
+echo "All documents are ready. Now you could export .odm to final .odt."
 echo "More info of how to do this: https://wiki.openoffice.org/wiki/Documentation/OOo3_User_Guides/Writer_Guide/Creating_one_file_from_a_master_document"

@@ -1,0 +1,13 @@
+INPUTFILE=build.template.md
+MARKDOWNFILE=build.espd.md
+INTERMEDIATE=build.espd.intermediate.odt
+ROOTTEMPLATE=build-root.template.odm
+OUTPUTDATAFILE=build.espd.odt
+OUTPUTROOTFILE=root.odm
+OUTPUTDIR=result-build.306
+
+DN="ТВГИ.00306-01"
+NAME1="Встроенное программное"
+NAME2="обеспечение менеджера"
+NAMEOF="встроенного программного обеспечения менеджера"
+DESIGNEDTO="(далее ПО REIMU) предназначено"
