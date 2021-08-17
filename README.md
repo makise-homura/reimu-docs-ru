@@ -4,13 +4,15 @@ The actual REIMU manual is [here](reimu.md).
 
 Build documentation is [here](reimu-BUILD.md).
 
+Integration documentation is [here](reimu-INTEGRATION.md).
+
 # How to build documentation
 
 ## Overview of building scheme
 
 ```
 *-git.conf ───────────────┐ vars
-                          ├──────► reimu.md, reimu-BUILD.md
+                          ├──────► reimu.md, reimu-BUILD.md, reimu-INTEGRATION.md
                      ┌────┘
 *.template.md ───────┤
                      └────┐ vars, links              pandoc                            unzip, styles             zip               mv
@@ -33,14 +35,15 @@ Build stages:
 * `mv`: move resulting `.odt` and `.odm` files to output directory
 
 Source files:
-* `{reimu,build}.template.md`: The source of documentation in Markdown format, including places for variable substitution
+* `{reimu,build,integration}.template.md`: The source of documentation in Markdown format, including places for variable substitution
 * `{reimu,build}-root.template.odm`: Template of master ODF document, including title, ToC, and changelog pages
-* `{reimu,build}-git.conf`: Variables for Markdown documentation
+* `{reimu,build,integration}-git.conf`: Variables for Markdown documentation
 * `{reimu,build}-espd.conf.*`: Variables for ESPD ODF documentation (`*` is `306`, `308`, and `dacn` for several output configurations)
 
 Created files:
 * `reimu.md`: Markdown documentation on usage
 * `reimu-BUILD.md`: Markdown documentation on build
+* `reimu-INTEGRATION.md`: Markdown documentation on integration
 * `result-manual.*/root.odm`: Master document of ESPD ODF documentation on usage (`*` is `306`, `308`, and `dacn`)
 * `result-manual.*/reimu.espd.odt`: Slave document of ESPD ODF documentation on usage (`*` is `306`, `308`, and `dacn`)
 * `result-build.*/root.odm`: Master document of ESPD ODF documentation on build (`*` is `306`, `308`, and `dacn`)

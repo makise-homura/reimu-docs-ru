@@ -81,6 +81,11 @@ echo "Creating Git Markdown manual..."
 add_comment $OUTPUTFILE
 substitute_intro $INPUTFILE $OUTPUTFILE "$NAME1 $NAME2 $DESIGNEDTO"
 
+echo "Creating Git Markdown integration manual..."
+. integration-git.conf
+add_comment $OUTPUTFILE
+copy_contents $INPUTFILE $OUTPUTFILE
+
 echo "Creating Git Markdown build manual..."
 . build-git.conf
 add_comment $OUTPUTFILE
