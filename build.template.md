@@ -52,16 +52,16 @@
 
 ## Требования к ПО, установленному на инструментальном ПК
 
-1) Ддолжны быть установлены программы `git` и `curl`.
+1) Должны быть установлены программы `git`, `curl`, `cpio`, `wget`, `python3-dev`.
 
-2) Должно быть развёрнуто сборочное окружение: для Ubuntu 20.04 его разворачивание зщаключается в установке пакетов `build-essentials`, `gcc`, `g++`, `make`, `gawk`, `diffstat`, `chrpath`, `binutils`.
+2) Должно быть развёрнуто сборочное окружение: для Ubuntu 20.04 его разворачивание заключается в установке пакетов `build-essential`, `gcc`, `g++`, `make`, `gawk`, `diffstat`, `chrpath`, `binutils`.
 
 3) Возможно, потребуется установка пакетов `libfdt1`, `libfdt-dev`, либо, наоборот, их удаление (в зависимости от ОС).
 
 В ОС Ubuntu (и других подобных) установка вышеупомянутого ПО выполняется командой:
 
 ```
-sudo apt install git curl build-essentials gcc g++ make gawk diffstat chrpath binutils libfdt1 libfdt-dev
+sudo apt install git curl cpio wget python3-dev build-essential gcc g++ make gawk diffstat chrpath binutils libfdt1 libfdt-dev
 ```
 
 ## Процедура сборки
