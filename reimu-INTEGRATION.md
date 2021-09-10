@@ -17,50 +17,55 @@
 
 ## Таблица назначения GPIO
 
-Наиболее актуальная таблица назначения GPIO указана в файле `/etc/gpiotab` на BMC.
+Наиболее актуальная таблица назначения GPIO указана в файлах `/etc/gpiotab/*` на BMC:
 
-В колонке «направление» указан не электрический источник сигнала, а устройство, инициирующее передачу. Здесь BMC — это BMC, PL — платформа.
+* `gpiotab.common`: GPIO-линии, общие для всех устройств.
+* `gpiotab.2400`: GPIO-линии для устройств на базе AST2400.
+* `gpiotab.2500`: GPIO-линии для устройств на базе AST2500.
+* `gpiotab.2600`: GPIO-линии для устройств на базе AST2600.
 
-| Обозначение                 | Направление | Назначение                                | Линия GPIO |
-|:--------------------------- |:-----------:|:----------------------------------------- |:----------:|
-| GPIO_PWR_BTN                | BMC&rarr;PL | Кнопка POWER платформы                    |     N5     |
-| GPIO_RST_BTN                | BMC&rarr;PL | Кнопка RESET платформы                    |     P3     |
-| GPIO_RESET_IN               | BMC&larr;PL | Сигнал «платформа под сбросом»            |     O3     |
-| GPIO_POWER_IN               | BMC&larr;PL | Сигнал «платформа под питанием»           |     O2     |
-| GPIO_INTRUSION              | BMC&larr;PL | Сигнал датчика вскрытия корпуса платформы |     R0     |
-| GPIO_ACT_LED                | BMC&rarr;PL | Светодиод «BMC работает»                  |     O6     |
-| GPIO_BOOT_LED               | BMC&rarr;PL | Светодиод «BMC загружается»               |     G1     |
-| GPIO_APMDZ_LED              | BMC&larr;PL | Сигнал от АПМДЗ платформы                 |     F3     |
-| GPIO_ALERT_1                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B0     |
-| GPIO_ALERT_2                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B5     |
-| GPIO_ALERT_3                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B6     |
-| GPIO_ALERT_4                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B2     |
-| GPIO_ALERT_5                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B3     |
-| GPIO_ALERT_6                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B1     |
-| GPIO_ALERT_7                | BMC&larr;PL | Один из сигналов ALERT платформы          |     B7     |
-| GPIO_MB_ID0                 | BMC&larr;PL | Идентификация платформы                   |     Y0     |
-| GPIO_MB_ID1                 | BMC&larr;PL | Идентификация платформы                   |     Y1     |
-| GPIO_MB_ID2                 | BMC&larr;PL | Идентификация платформы                   |     Y2     |
-| GPIO_MB_ID3                 | BMC&larr;PL | Идентификация платформы                   |     Y3     |
-| GPIO_SPI_CONNECT            | BMC&rarr;PL | Подключение SPI памяти платформы          |     O0     |
-| **На платформах без CPLD:** |             |                                           |            |
-| GPIO_UID_BTN                | BMC&larr;PL | Кнопка UID платформы                      |     N3     |
-| GPIO_UID_LED                | BMC&rarr;PL | Светодиод UID платформы                   |     N4     |
-| GPIO_SYS_FAIL1_LED          | BMC&rarr;PL | Светодиод SYS FAIL 1 платформы            |     C2     |
-| GPIO_SYS_FAIL2_LED          | BMC&rarr;PL | Светодиод SYS FAIL 2 платформы            |     C7     |
-| GPIO_PWR_FAIL_LED           | BMC&rarr;PL | Светодиод POWER FAIL платформы            |     A3     |
-| GPIO_OH_FF1_LED             | BMC&rarr;PL | Светодиод OVERHEAT/FAN FAIL 1 платформы   |     A2     |
-| GPIO_OH_FF2_LED             | BMC&rarr;PL | Светодиод OVERHEAT/FAN FAIL 2 платформы   |     Q6     |
-| GPIO_FAN_FAIL_LED           | BMC&rarr;PL | Светодиод FAN FAIL платформы              |     C6     |
-| GPIO_OVERHEAT_LED           | BMC&rarr;PL | Светодиод OVERHEAT платформы              |     C3     |
-| GPIO_ALARM_LED              | BMC&rarr;PL | Светодиод ALARM платформы                 |     G0     |
-| **На платформах c CPLD:**   |             |                                           |            |
-| GPIO_UID_BTN                | BMC&rarr;PL | Кнопка UID платформы                      |     N3     |
-| GPIO_UID_LED                | BMC&larr;PL | Состояние UID платформы                   |     N4     |
-| GPIO_TINYSPI_CS             | BMC&rarr;PL | Канал связи с CPLD                        |     N2     |
-| GPIO_TINYSPI_IO             | BMC&rarr;PL | Канал связи с CPLD                        |     N1     |
-| GPIO_TINYSPI_CLK            | BMC&rarr;PL | Канал связи с CPLD                        |     N0     |
-| GPIO_TINYSPI_ALERT          | BMC&larr;PL | Сигнал «CPLD изменила состояние»          |     N6     |
+Далее приведена краткая сводка GPIO. В колонке «направление» указан не электрический источник сигнала, а устройство, инициирующее передачу. Здесь BMC — это BMC, PL — платформа. В колонке "Линия GPIO" в скобках указаны линии для AST2600, если они отличаются от линий для AST2400 и AST2500.
+
+| Обозначение                 | Направление | Назначение                                | Линия GPIO  |
+|:--------------------------- |:-----------:|:----------------------------------------- |:-----------:|
+| GPIO_PWR_BTN                | BMC&rarr;PL | Кнопка POWER платформы                    |   N5 (V5)   |
+| GPIO_RST_BTN                | BMC&rarr;PL | Кнопка RESET платформы                    |      P3     |
+| GPIO_RESET_IN               | BMC&larr;PL | Сигнал «платформа под сбросом»            |      O3     |
+| GPIO_POWER_IN               | BMC&larr;PL | Сигнал «платформа под питанием»           |      O2     |
+| GPIO_INTRUSION              | BMC&larr;PL | Сигнал датчика вскрытия корпуса платформы |      R0     |
+| GPIO_ACT_LED                | BMC&rarr;PL | Светодиод «BMC работает»                  |      O6     |
+| GPIO_BOOT_LED               | BMC&rarr;PL | Светодиод «BMC загружается»               |      G1     |
+| GPIO_APMDZ_LED              | BMC&larr;PL | Сигнал от АПМДЗ платформы                 |      F3     |
+| GPIO_ALERT_1                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B0     |
+| GPIO_ALERT_2                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B5     |
+| GPIO_ALERT_3                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B6     |
+| GPIO_ALERT_4                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B2     |
+| GPIO_ALERT_5                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B3     |
+| GPIO_ALERT_6                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B1     |
+| GPIO_ALERT_7                | BMC&larr;PL | Один из сигналов ALERT платформы          |      B7     |
+| GPIO_MB_ID0                 | BMC&larr;PL | Идентификация платформы                   |      Y0     |
+| GPIO_MB_ID1                 | BMC&larr;PL | Идентификация платформы                   |      Y1     |
+| GPIO_MB_ID2                 | BMC&larr;PL | Идентификация платформы                   |      Y2     |
+| GPIO_MB_ID3                 | BMC&larr;PL | Идентификация платформы                   |      Y3     |
+| GPIO_SPI_CONNECT            | BMC&rarr;PL | Подключение SPI памяти платформы          |      O0     |
+| **На платформах без CPLD:** |             |                                           |             |
+| GPIO_UID_BTN                | BMC&larr;PL | Кнопка UID платформы                      |   N3 (V3)   |
+| GPIO_UID_LED                | BMC&rarr;PL | Светодиод UID платформы                   |   N4 (V4)   |
+| GPIO_SYS_FAIL1_LED          | BMC&rarr;PL | Светодиод SYS FAIL 1 платформы            |      C2     |
+| GPIO_SYS_FAIL2_LED          | BMC&rarr;PL | Светодиод SYS FAIL 2 платформы            |      C7     |
+| GPIO_PWR_FAIL_LED           | BMC&rarr;PL | Светодиод POWER FAIL платформы            |      A3     |
+| GPIO_OH_FF1_LED             | BMC&rarr;PL | Светодиод OVERHEAT/FAN FAIL 1 платформы   |      A2     |
+| GPIO_OH_FF2_LED             | BMC&rarr;PL | Светодиод OVERHEAT/FAN FAIL 2 платформы   |      Q6     |
+| GPIO_FAN_FAIL_LED           | BMC&rarr;PL | Светодиод FAN FAIL платформы              |      C6     |
+| GPIO_OVERHEAT_LED           | BMC&rarr;PL | Светодиод OVERHEAT платформы              |      C3     |
+| GPIO_ALARM_LED              | BMC&rarr;PL | Светодиод ALARM платформы                 |      G0     |
+| **На платформах c CPLD:**   |             |                                           |             |
+| GPIO_UID_BTN                | BMC&rarr;PL | Кнопка UID платформы                      |   N3 (V3)   |
+| GPIO_UID_LED                | BMC&larr;PL | Состояние UID платформы                   |   N4 (V4)   |
+| GPIO_TINYSPI_CS             | BMC&rarr;PL | Канал связи с CPLD                        |   N2 (V2)   |
+| GPIO_TINYSPI_IO             | BMC&rarr;PL | Канал связи с CPLD                        |   N1 (V1)   |
+| GPIO_TINYSPI_CLK            | BMC&rarr;PL | Канал связи с CPLD                        |   N0 (V0)   |
+| GPIO_TINYSPI_ALERT          | BMC&larr;PL | Сигнал «CPLD изменила состояние»          |   N6 (V6)   |
 
 ### Пины GPIO_MB_ID
 
