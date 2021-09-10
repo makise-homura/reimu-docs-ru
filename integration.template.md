@@ -322,3 +322,91 @@ E      C
   DDDD   H
 
 ```
+
+## Запуск образа REIMU под эмулятором
+
+В крайне ограниченном режиме возможно запустить образ REIMU под добработанным эмулятором QEMU. Это может быть удобно в случае отладки запуска U-Boot, ядра и т.п. Разумеется, никакой функционал, завязанный на GPIO, FRU ID, device tree платформы и т.п. работать не будет.
+
+### Добавление новых машин в QEMU
+
+Для запуска эмулятора QEMU с образом REIMU необходимо пересобрать его с добавлением новых машин. Для этого нужно пропатчить файл `hw/arm/aspeed.c` следующим патчем (для версии `qemu-4.2`, для других версий номера строк могут отличаться):
+
+```
+@@ -418,6 +418,47 @@
+ 
+ static const AspeedBoardConfig aspeed_boards[] = {
+     {
++        .name      = MACHINE_TYPE_NAME("reimu-4532"),
++        .desc      = "MCST REIMU-4532",
++        .soc_name  = "ast2400-a1",
++        .hw_strap1 = PALMETTO_BMC_HW_STRAP1,
++        .fmc_model = "w25q256",
++        .spi_model = "w25q256",
++        .num_cs    = 1,
++        .i2c_init  = palmetto_bmc_i2c_init,
++        .ram       = 256 * MiB,
++    }, {
++        .name      = MACHINE_TYPE_NAME("reimu-4564"),
++        .desc      = "MCST REIMU-4564",
++        .soc_name  = "ast2400-a1",
++        .hw_strap1 = PALMETTO_BMC_HW_STRAP1,
++        .fmc_model = "w25q512jv",
++        .spi_model = "w25q512jv",
++        .num_cs    = 1,
++        .i2c_init  = palmetto_bmc_i2c_init,
++        .ram       = 256 * MiB,
++    }, {
++        .name      = MACHINE_TYPE_NAME("reimu-5564"),
++        .desc      = "REIMU-5564",
++        .soc_name  = "ast2500-a1",
++        .hw_strap1 = AST2500_EVB_HW_STRAP1,
++        .fmc_model = "w25q512jv",
++        .spi_model = "w25q512jv",
++        .num_cs    = 1,
++        .i2c_init  = ast2500_evb_i2c_init,
++        .ram       = 512 * MiB,
++    }, {
++        .name      = MACHINE_TYPE_NAME("reimu-6564"),
++        .desc      = "REIMU-6564",
++        .soc_name  = "ast2600-a0",
++        .hw_strap1 = AST2600_EVB_HW_STRAP1,
++        .hw_strap2 = AST2600_EVB_HW_STRAP2,
++        .fmc_model = "w25q512jv",
++        .spi_model = "w25q512jv",
++        .num_cs    = 1,
++        .i2c_init  = ast2600_evb_i2c_init,
++        .ram       = 1 * GiB,
++    }, {
+         .name      = MACHINE_TYPE_NAME("palmetto-bmc"),
+         .desc      = "OpenPOWER Palmetto BMC (ARM926EJ-S)",
+         .soc_name  = "ast2400-a1",
+```
+
+После этого надо пересобрать QEMU (точнее, исполняемый файл `qemu-system-arm`). Команды `configure && make` это сделают (при желании можно пустить сборку в несколько потоков ключом `-j` для make).
+
+### Запуск образа
+
+Если мы находимся в каталоге сборки QEMU, то можно запустить эмуляцию подобной командой:
+
+```
+arm-softmmu/qemu-system-arm -M reimu-4564 -drive file=image.static.mtd,format=raw,if=mtd -serial stdio
+```
+
+Параметр `file` ключа `-drive` задаёт путь к образу (который получается при сборке в виде файла `*.static.mtd`).
+
+Ключ `-M` задаёт тип машины. Из-за ограничений QEMU поддерживаются только машины, которые имеют вывод на UART5 (`reimu-4532`, `reimu-4564`, `reimu-5564`, `reimu-6564`).
+
+Можно запустить и образ, который выводит данные в UART2 (например, `reimu-4232m` и `reimu-4232` с ключом `-M reimu-4532`, и `reimu-4264` с ключом `reimu-4564`), но для этого при каждой загрузке необходимо останавливать U-Boot нажатием клавиши пробела (для появления приглашения `ast#`) и продолжать загрузку последующим вводом команд:
+
+```
+setenv bootargs console=ttyS4,115200n8 root=/dev/ram rw
+boot
+```
+
+При эмуляции QEMU создаст окно интерфейса с эмулятором. Если это не нужно, то к строке запуска надо добавить параметры `-nodefaults -nographic`.
+
+Следует понимать, что в процессе работы некоторые части образа (переменные U-Boot, раздел с пользовательскими данными) могут изменяться. Поэтому эксперименты стоит проводить на копии собранного образа, чтобы его не испортить.
+
+При сборке образа для эмулятора рекомендуется удалить пакет `revert-to-mfg` из добавляемых в образ (отредактировав файл `meta-mcst/meta-common/recipes-phosphor/images/obmc-phosphor-image.bbappend`), иначе это приведёт к циклической перезагрузке (для эмулятора кнопка UID выглядит всегда нажатой).
+
+Эмуляцию можно прервать, либо нажав Ctrl+C в консоли, либо введя команду `q` в окне интерфейса QEMU.
