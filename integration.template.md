@@ -327,32 +327,40 @@ E      C
 
 В крайне ограниченном режиме возможно запустить образ REIMU под добработанным эмулятором QEMU. Это может быть удобно в случае отладки запуска U-Boot, ядра и т.п. Разумеется, никакой функционал, завязанный на GPIO, FRU ID, device tree платформы и т.п. работать не будет.
 
+### Подготовка образа Reimu
+
+При сборке образа для эмулятора рекомендуется удалить пакет `revert-to-mfg` из добавляемых в образ (отредактировав файл `meta-mcst/meta-common/recipes-phosphor/images/obmc-phosphor-image.bbappend`), иначе это приведёт к циклической перезагрузке (для эмулятора кнопка UID выглядит всегда нажатой).
+
+### Скачивание последней версии QEMU
+  ```
+  wget https://jenkins.openbmc.org/job/latest-qemu-x86/lastSuccessfulBuild/artifact/qemu/build/qemu-system-arm
+
+  chmod u+x qemu-system-arm
+  ```
 ### Запуск образа
 
-Если мы находимся в каталоге сборки QEMU, то можно запустить эмуляцию подобной командой:
-
-```
-arm-softmmu/qemu-system-arm -M reimu-4564 -drive file=image.static.mtd,format=raw,if=mtd -serial stdio
-```
-
-Параметр `file` ключа `-drive` задаёт путь к образу (который получается при сборке в виде файла `*.static.mtd`).
-
-Ключ `-M` задаёт тип машины. Из-за ограничений QEMU поддерживаются только машины, которые имеют вывод на UART5 (`reimu-4532`, `reimu-4564`, `reimu-5564`, `reimu-6564`).
-
-Можно запустить и образ, который выводит данные в UART2 (например, `reimu-4232m` и `reimu-4232` с ключом `-M reimu-4532`, и `reimu-4264` с ключом `-M reimu-4564`), но для этого при каждой загрузке необходимо останавливать U-Boot нажатием клавиши пробела (для появления приглашения `ast#`) и продолжать загрузку последующим вводом команд:
-
+ 1. Задать путь к образу (который получается при сборке в виде файла `*.static.mtd`)
+ `IMAGE=obmc-phosphor-image-reimu-XXXX.static.mtd`
+ 2. Если мы находимся в каталоге со сборкой QEMU, то можно запустить эмуляцию подобной командой
+ 	- для `reimu-4232m` и `reimu-4232`
+ 	  `./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
+ 	  при каждой загрузке необходимо останавливать U-Boot нажатием клавиши пробела (для появления приглашения `ast#`) и продолжать загрузку последующим вводом команд:
 ```
 setenv bootargs console=ttyS4,115200n8 root=/dev/ram rw
 boot
 ```
-
-При эмуляции QEMU создаст окно интерфейса с эмулятором. Если это не нужно, то к строке запуска надо добавить параметры `-nodefaults -nographic`.
+	- для `reimu-4532`
+ 	  `./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
+	- для `reimu-4564`
+ 	  `./qemu-system-arm -M supermicrox11-bmc,fmc-model=n25q512a -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
+	- для `reimu-5564`
+	  `./qemu-system-arm -m 512 -M ast2500-evb,fmc-model=n25q512a -nographic -drive file=$OBMCIMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
+	- для `reimu-6564`
+	  `./qemu-system-arm -m 512 -M ast2600-evb,fmc-model=n25q512a -nographic -drive file=$OBMCIMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
 
 Следует понимать, что в процессе работы некоторые части образа (переменные U-Boot, раздел с пользовательскими данными) могут изменяться. Поэтому эксперименты стоит проводить на копии собранного образа, чтобы его не испортить.
 
-При сборке образа для эмулятора рекомендуется удалить пакет `revert-to-mfg` из добавляемых в образ (отредактировав файл `meta-mcst/meta-common/recipes-phosphor/images/obmc-phosphor-image.bbappend`), иначе это приведёт к циклической перезагрузке (для эмулятора кнопка UID выглядит всегда нажатой).
-
-Эмуляцию можно прервать, либо нажав Ctrl+C в консоли, либо введя команду `q` в окне интерфейса QEMU.
+Эмуляцию можно прервать нажав `ctrl+a x` в консоли
 
 ## Перспективы добавления нового ПО в образ
 
