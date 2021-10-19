@@ -340,23 +340,35 @@ E      C
 ### Запуск образа
 
  1. Задать путь к образу (который получается при сборке в виде файла `*.static.mtd`)
- `IMAGE=obmc-phosphor-image-reimu-XXXX.static.mtd`
+    ```
+    IMAGE=obmc-phosphor-image-reimu-XXXX.static.mtd
+    ```
  2. Если мы находимся в каталоге со сборкой QEMU, то можно запустить эмуляцию подобной командой
  	- для `reimu-4232m` и `reimu-4232`
- 	  `./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
- 	  при каждой загрузке необходимо останавливать U-Boot нажатием клавиши пробела (для появления приглашения `ast#`) и продолжать загрузку последующим вводом команд:
-```
-setenv bootargs console=ttyS4,115200n8 root=/dev/ram rw
-boot
-```
-	- для `reimu-4532`
- 	  `./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
-	- для `reimu-4564`
- 	  `./qemu-system-arm -M supermicrox11-bmc,fmc-model=n25q512a -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
-	- для `reimu-5564`
-	  `./qemu-system-arm -m 512 -M ast2500-evb,fmc-model=n25q512a -nographic -drive file=$OBMCIMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
-	- для `reimu-6564`
-	  `./qemu-system-arm -m 512 -M ast2600-evb,fmc-model=n25q512a -nographic -drive file=$OBMCIMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu`
+        ```
+        ./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
+        ```
+        Для корректного отображения в консоли, при каждой загрузке необходимо останавливать U-Boot нажатием клавиши пробела (для появления приглашения `ast#`) и продолжать загрузку последующим вводом команд:
+        ```
+        setenv bootargs console=ttyS4,115200n8 root=/dev/ram rw
+        boot
+        ```
+    - для `reimu-4532`
+        ```
+        ./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
+        ```
+    - для `reimu-4564`
+        ```
+        ./qemu-system-arm -M supermicrox11-bmc,fmc-model=n25q512a -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
+        ```
+    - для `reimu-5564`
+        ```
+        ./qemu-system-arm -m 512 -M ast2500-evb,fmc-model=n25q512a -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
+        ```
+    - для `reimu-6564`
+        ```
+        ./qemu-system-arm -m 512 -M ast2600-evb,fmc-model=n25q512a -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
+        ```
 
 Следует понимать, что в процессе работы некоторые части образа (переменные U-Boot, раздел с пользовательскими данными) могут изменяться. Поэтому эксперименты стоит проводить на копии собранного образа, чтобы его не испортить.
 
