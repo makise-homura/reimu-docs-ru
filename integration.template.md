@@ -334,16 +334,15 @@ E      C
 ### Скачивание последней версии QEMU
   ```
   wget https://jenkins.openbmc.org/job/latest-qemu-x86/lastSuccessfulBuild/artifact/qemu/build/qemu-system-arm
-
   chmod u+x qemu-system-arm
   ```
 ### Запуск образа
 
  1. Задать путь к образу (который получается при сборке в виде файла `*.static.mtd`)
     ```
-    IMAGE=obmc-phosphor-image-reimu-XXXX.static.mtd
+    IMAGE=/path/to/image/obmc-phosphor-image-reimu-XXXX.static.mtd
     ```
- 2. Если мы находимся в каталоге со сборкой QEMU, то можно запустить эмуляцию подобной командой
+ 2. Если мы находимся в каталоге со скачанным исполняемым файлом qemu, то можно запустить эмуляцию подобной командой
  	- для `reimu-4232m` и `reimu-4232`
         ```
         ./qemu-system-arm -M supermicrox11-bmc -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
@@ -370,9 +369,14 @@ E      C
         ./qemu-system-arm -m 512 -M ast2600-evb,fmc-model=n25q512a -nographic -drive file=$IMAGE,format=raw,if=mtd -net nic -net user,hostfwd=:127.0.0.1:2222-:22,hostfwd=:127.0.0.1:2443-:443,hostfwd=udp:127.0.0.1:2623-:623,hostname=qemu
         ```
 
+    Где
+    - `hostfwd=:127.0.0.1:2222-:22` - проброс 22 порта на 2222 для подключения по ssh
+    - `hostfwd=:127.0.0.1:2443-:443` - проброс 443 порта на 2443 для подключения по https
+    - `hostfwd=udp:127.0.0.1:2623-:623` - проброс 623 порта на 2623 для подключения по ipmi 
+
 Следует понимать, что в процессе работы некоторые части образа (переменные U-Boot, раздел с пользовательскими данными) могут изменяться. Поэтому эксперименты стоит проводить на копии собранного образа, чтобы его не испортить.
 
-Эмуляцию можно прервать нажав `ctrl+a x` в консоли
+Эмуляцию можно прервать нажав `ctrl+a x` в консоли.
 
 ## Перспективы добавления нового ПО в образ
 
