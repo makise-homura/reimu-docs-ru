@@ -262,6 +262,8 @@ Web-интерфейс менеджера присутствует только 
 * Качество цветопередачи (Color quality): Medium (не Full).
 * Разрешить сжатие JPEG (Allow JPEG compression): выключено.
 
+Рекомендуемый клиент для работы: [TigerVNC](https://tigervnc.org/) [Загрузить](https://sourceforge.net/projects/tigervnc/files/stable/)
+
 ## Media-over-IP
 
 Для флавора REIMU-5564 возможно подключение удалённых образов дисков к платформе.
